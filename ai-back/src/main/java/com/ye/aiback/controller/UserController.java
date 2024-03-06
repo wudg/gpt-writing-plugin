@@ -1,63 +1,89 @@
 package com.ye.aiback.controller;
 
-import cn.dev33.satoken.stp.StpUtil;
+
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ye.aiback.domain.R;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ye.aiback.entity.User;
+import com.ye.aiback.service.UserService;
+import io.swagger.annotations.Api;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.List;
 
+/**
+ * (User)表控制层
+ *
+ * @author makejava
+ * @since 2024-03-06 23:26:05
+ */
+@Api(tags = "用户操作",value = "用户操作")
 @RestController
-@RequestMapping("/user/")
+@RequestMapping("users")
 public class UserController {
+    /**
+     * 服务对象
+     */
+    @Resource
+    private UserService userService;
 
-    private static Map<String, String> users = new HashMap<>(16);
-    private static Set<String> legalCodeSet = new HashSet<>();
-
-    static {
-        legalCodeSet.add("5555");
-        legalCodeSet.add("6666");
-        legalCodeSet.add("7777");
+    /**
+     * 分页查询所有数据
+     *
+     * @param page 分页对象
+     * @param user 查询实体
+     * @return 所有数据
+     */
+    @GetMapping
+    public R selectAll(Page<User> page, User user) {
+        return R.ok(this.userService.page(page, new QueryWrapper<>(user)));
     }
 
-    // 测试登录，浏览器访问： http://localhost:8081/user/doLogin?username=zhang&password=123456
-    @RequestMapping("doLogin")
-    public R doLogin(String username, String password) {
-        // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
-        for (Map.Entry<String, String> entry : users.entrySet()) {
-            if(entry.getKey().equals(username) && entry.getValue().equals(password)) {
-                if(entry.getValue().equals(password)){
-                    StpUtil.login(10001);
-                    return R.ok("登录成功");
-                }else{
-                    R.fail("登录密码错误，请重试");
-                }
-            }
-        }
-        return R.fail("登录失败");
+    /**
+     * 通过主键查询单条数据
+     *
+     * @param id 主键
+     * @return 单条数据
+     */
+    @GetMapping("{id}")
+    public R selectOne(@PathVariable Serializable id) {
+        return R.ok(this.userService.getById(id));
     }
 
-    @RequestMapping("doRegister")
-    public R doRegister(String username, String password, String registerCode) {
-        // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
-        if(Objects.isNull(registerCode) || registerCode.length() == 0){
-            return R.fail("注册码不能为空，如果没有验证码，请联系开发人员（Y1490727316）");
-        }
-        // check code legal
-        if(!legalCodeSet.contains(registerCode)){
-            return R.fail("注册码不存在或已被使用，请联系开发人员（Y1490727316）");
-        }
-        users.put(username, password);
-        legalCodeSet.remove(registerCode);
-        return R.ok();
+    /**
+     * 新增数据
+     *
+     * @param user 实体对象
+     * @return 新增结果
+     */
+    @PostMapping
+    public R insert(@RequestBody User user) {
+        return R.ok(this.userService.save(user));
     }
 
-    // 查询登录状态，浏览器访问： http://localhost:8081/user/isLogin
-    @RequestMapping("isLogin")
-    public R isLogin() {
-        return R.ok(StpUtil.isLogin());
+    /**
+     * 修改数据
+     *
+     * @param user 实体对象
+     * @return 修改结果
+     */
+    @PutMapping
+    public R update(@RequestBody User user) {
+        return R.ok(this.userService.updateById(user));
     }
 
+    /**
+     * 删除数据
+     *
+     * @param idList 主键结合
+     * @return 删除结果
+     */
+    @DeleteMapping
+    public R delete(@RequestParam("idList") List<Long> idList) {
+        return R.ok(this.userService.removeByIds(idList));
+    }
 }
 

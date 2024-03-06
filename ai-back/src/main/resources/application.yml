@@ -20,7 +20,18 @@ sa-token:
   is-log: true
 
 spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/gpt-writing-plugin?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:5555}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mybatis-plus:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+      map-underscore-to-camel-case: true
   thymeleaf:
     prefix:
       classpath: /templates   # 访问template下的html文件需要配置模板，映射
     cache: false # 开发时关闭缓存,不然没法看到实时页面
+  profiles:
+    active: dev

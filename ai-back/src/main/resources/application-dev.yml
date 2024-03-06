@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/gpt-writing-plugin?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:5555}
+    driver-class-name: com.mysql.cj.jdbc.Driver

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ye.aiback.dao.UserDao">
+
+    <resultMap type="com.ye.aiback.entity.User" id="UserMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="registerCode" column="register_code" jdbcType="VARCHAR"/>
+        <result property="registerTime" column="register_time" jdbcType="TIMESTAMP"/>
+        <result property="deadline" column="deadline" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMap">
+        select
+          id, password, username, register_code, register_time, deadline, status
+        from t_user
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserMap">
+        select
+          id, password, username, register_code, register_time, deadline, status
+        from t_user
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="registerCode != null and registerCode != ''">
+                and register_code = #{registerCode}
+            </if>
+            <if test="registerTime != null">
+                and register_time = #{registerTime}
+            </if>
+            <if test="deadline != null">
+                and deadline = #{deadline}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from t_user
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="registerCode != null and registerCode != ''">
+                and register_code = #{registerCode}
+            </if>
+            <if test="registerTime != null">
+                and register_time = #{registerTime}
+            </if>
+            <if test="deadline != null">
+                and deadline = #{deadline}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into t_user(password, username, register_code, register_time, deadline, status)
+        values (#{password}, #{username}, #{registerCode}, #{registerTime}, #{deadline}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into t_user(password, username, register_code, register_time, deadline, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.password}, #{entity.username}, #{entity.registerCode}, #{entity.registerTime}, #{entity.deadline}, #{entity.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into t_user(password, username, register_code, register_time, deadline, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.password}, #{entity.username}, #{entity.registerCode}, #{entity.registerTime}, #{entity.deadline}, #{entity.status})
+        </foreach>
+        on duplicate key update
+        password = values(password),
+        username = values(username),
+        register_code = values(register_code),
+        register_time = values(register_time),
+        deadline = values(deadline),
+        status = values(status)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update t_user
+        <set>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="registerCode != null and registerCode != ''">
+                register_code = #{registerCode},
+            </if>
+            <if test="registerTime != null">
+                register_time = #{registerTime},
+            </if>
+            <if test="deadline != null">
+                deadline = #{deadline},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from t_user where id = #{id}
+    </delete>
+
+</mapper>
+
