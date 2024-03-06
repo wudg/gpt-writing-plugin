@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>注册</title>
+    <meta charset="utf-8">
+    <base th:href="@{/}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="./sa-res/register.css">
+</head>
+<body>
+<div class="view-box">
+    <div class="bg-1"></div>
+    <div class="bg-2"></div>
+    <div class="content-box">
+        <div class="register-box">
+            <div class="from-box">
+                <h2 class="from-title" utext="注册"></h2>
+                <div class="from-item">
+                    <input class="s-input" name="name" placeholder="请输入用户名" />
+                </div>
+                <div class="from-item">
+                    <input class="s-input" name="pwd" type="password" placeholder="请输入密码" />
+                </div>
+                <div class="from-item">
+                    <input class="s-input" name="registerCode" placeholder="请输入注册码" />
+                </div>
+                <div class="from-item">
+                    <button class="s-input s-btn register-btn">注册</button>
+                </div>
+                <div class="from-item reset-box">
+                    <a href="javascript: location.reload();" >刷新</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- scripts -->
+<script src="./sa-res/jquery.min.js"></script>
+<script src="./sa-res/layer/layer.js"></script>
+<script src="./sa-res/register.js"></script>
+</body>
+</html>
