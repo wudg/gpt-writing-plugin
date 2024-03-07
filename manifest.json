@@ -1,0 +1,73 @@
+{
+    "manifest_version": 3,
+    "name": "AI-document",
+    "description": "这是一个利用AI智能采集热点文章，生成爆文，自动导出word文档的工具",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "testicon.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "scripting"
+    ],
+    "background": {
+        "service_worker": "js/background.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "js/jquery-3.3.1.min.js",
+                "js/content.js"
+            ],
+            "matches": [
+                "http://127.0.0.1:5500/*",
+                "https://chat.openai.com/*",
+                "https://www.toutiao.com/article/*",
+                "https://www.toutiao.com/w/*",
+                "https://www.sohu.com/a/*",
+                "https://www.163.com/news/*",
+                "https://www.163.com/dy/*",
+                "http://a.mp.uc.cn/*",
+                "https://mparticle.uc.cn/*",
+                "https://new.qq.com/*",
+                "https://www.yidianzixun.com/article/*",
+                "http://html2.qktoutiao.com/detail/*",
+                "https://*.sina.cn/*",
+                "https://kandianshare.html5.qq.com/*",
+                "https://www.360kuai.com/*",
+                "https://zhuanlan.zhihu.com/p/*",
+                "https://www.bilibili.com/read/*",
+                "https://mbd.baidu.com/*",
+                "https://baijiahao.baidu.com/*",
+                "https://www.jianshu.com/p/*",
+                "https://*.csdn.net/*",
+                "https://juejin.cn/post/*",
+                "https://mp.weixin.qq.com/*",
+                "https://item.btime.com/*",
+                "https://*.pintu360.com/*",
+                "https://www.admin5.com/article/*",
+                "https://*.iyiou.com/analysis/*",
+                "https://www.tmtpost.com/*",
+                "https://www.huxiu.com/article/*",
+                "http://www.ikanchai.com/article/*",
+                "https://www.sootoo.com/content/*",
+                "https://www.iheima.com/article*",
+                "https://www.leiphone.com/category*",
+                "http://www.news.cn/politics/*",
+                "https://news.cctv.com/*",
+                "https://www.xiaohongshu.com/explore/*",
+                "https://www.jiemian.com/article/*",
+                "https://mini.eastday.com/nsa/*",
+                "https://www.jushengw.com/*",
+                "https://news.iresearch.cn/content/*",
+                "https://bbs.hupu.com/*",
+                "https://www.douban.com/group/*",
+                "http://*.bossdata.cn/caixin/*",
+                "https://ishare.ifeng.com/c/*"
+            ]
+        }
+    ]
+}
