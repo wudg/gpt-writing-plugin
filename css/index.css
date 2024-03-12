@@ -1,0 +1,170 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+#ask {
+    position: fixed;
+    width: 900px;
+    height: 1000px;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 10px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 24px;
+    z-index: 999;
+}
+#mask{
+    position: fixed; 
+    background-color: rgba(0, 0, 0, 0.8);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 998;
+}
+#ask .title {
+    color: #333;
+}
+#ask form {
+    height: 900px !important;
+    padding: 10px 0;
+    overflow: auto
+}
+#ask form p {
+    margin: 12px 0;
+}
+#ask form span {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #333333; 
+}
+
+#ask form textarea {
+    display: block;
+    height: 100px; 
+    width: calc(100% - 20px);
+    font-size: 16px;
+    color: #333;
+    resize: none;
+    padding: 8px;
+    border-radius: 8px;
+}
+#ask .divflex {
+    display: flex;
+    align-items: center;
+}
+#ask .divflex #titleCount {
+    height: 34px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #434343;
+}
+#ask .divflex .wordTypeBox {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+#ask form textarea#briefContent {
+    height: 50px
+}
+
+#ask form textarea#newTitle {
+    height: 40px
+}
+
+#ask #titleCount {
+    width: 100px
+}
+
+#ask .wordTypeBox {
+    display: inline-block;
+    margin: 0 0 0 30px
+}
+
+#ask #wordType {
+    height: 36px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #434343;
+} 
+#btnBOx {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%)
+}
+
+#btnBOx span {
+    margin: 0 30px;
+    padding: 6px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    color: #2f2f2f;
+    cursor: pointer;
+    background-color: #d9d9d9;
+}
+
+#ask form span.select-btn {
+    width: auto !important;
+    margin-left: 15px;
+    background: #e2ebf7;
+    padding: 4px 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #8d8888;
+    cursor: pointer
+}
+
+#ask form span.delete-all-btn {
+    width: auto !important;
+    margin-left: 25px;
+    background: #fff;
+    color: red;
+    padding: 4px 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid red;
+    cursor: pointer
+}
+
+#btnBOx span#confirmButton {
+    background: #54b01c;
+    color: #fff;
+    text-shadow: none;
+    border-radius: 6px;
+    border: none;
+}
+
+#contentListsDom {
+    height: 280px;
+    padding-right: 30px;
+    overflow: auto
+}
+
+#contentListsDom li {
+    padding: 6px 0;
+    border-bottom: 1px solid #b8b5b5
+}
+
+#contentListsDom input {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 10px
+}
+
+#contentListsDom .delete-btn {
+    width: auto;
+    float: right;
+    color: red;
+    cursor: pointer
+}
+
+#contentListsDom ul,
+li {
+    list-style: none
+}

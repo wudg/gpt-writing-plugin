@@ -13,14 +13,16 @@
         "scripting"
     ],
     "background": {
-        "service_worker": "js/background.js",
-        "type": "module"
+        "service_worker": "js/background.js"
     },
     "content_scripts": [
         {
             "js": [
                 "js/jquery-3.3.1.min.js",
                 "js/content.js"
+            ],
+            "css": [
+                "css/index.css"
             ],
             "matches": [
                 "http://127.0.0.1:5500/*",

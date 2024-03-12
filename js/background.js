@@ -43,6 +43,12 @@ chrome.runtime.onMessage.addListener(
             sendResponse({ message: data });
             return true;
         }
+        if (request.message === "myMethod") {
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, 'sd234234234');
+            });
+            return true;
+        }
         return true;
     }
 );
@@ -63,17 +69,12 @@ function openAsk() {
                 askId = null;
             }
         });
-        
-        chrome.tabs.executeScript(window.tabs[0].id, { file: "content.js" }, function () {
-            chrome.tabs.sendMessage(window.tabs[0].id, { method: "myMethod" }, function (response) {
-                // 处理来自 content script 的响应
-                console.log(response);
-            });
-        });
-
-
     });
 };
+
+
+
+
 // 关闭Ask窗口
 function closeAsk() {
     if (askId) {
