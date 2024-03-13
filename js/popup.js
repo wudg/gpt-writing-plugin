@@ -19,7 +19,7 @@ $('.login-btn').click(function () {
     }
     // 开始登录 
     $.ajax({
-        url: "http://frp.wudiguang.top/user/doLogin",
+        url: "http://aiwrite.wudiguang.top/user/doLogin",
         type: "post",
         data: {
             username: username,
@@ -84,7 +84,7 @@ $('.register-btn').click(function () {
     }
     // 开始注册 
     $.ajax({
-        url: "http://frp.wudiguang.top/user/doRegister",
+        url: "http://aiwrite.wudiguang.top/user/doRegister",
         type: "post",
         data: {
             username: username,
@@ -114,7 +114,7 @@ $('.register-btn').click(function () {
     chrome.storage.local.get(['token'], function (items) {
         token = items['token'] || null;
         $.ajax({
-            url: "http://frp.wudiguang.top/user/isLogin?token=" + token,
+            url: "http://aiwrite.wudiguang.top/user/isLogin?token=" + token,
             type: "get",
             dataType: 'json',
             async: false, // 将 async 设置为 false
@@ -124,7 +124,6 @@ $('.register-btn').click(function () {
             success: function (res) {
                 let status = res.data;
                 if (!status) {
-                    alert('当前没有登录，或登录失效，请重新登录');
                     chrome.storage.local.set({ 'token': null });
                     token = null;
                 }

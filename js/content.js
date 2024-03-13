@@ -7,11 +7,11 @@ var gatherList = []; // 采集的数据列表
 var loding = false;
 var selectAll = false;
 var textarea = null; // textarea 输入框元素
-var currentPage = -1; // 当前回答的问题 
+var currentPage = 0; // 当前回答的问题 
+var currentPrompt = [];
 (function () {
     // 获取textarea元素
     textarea = document.getElementById('prompt-textarea');
-
     // 创建页面中的按钮组
     var div = document.createElement('div');
     div.style.position = 'fixed';
@@ -91,6 +91,15 @@ async function startGather() {
         chrome.storage.local.set({ 'gather-list': gatherList }, function () {
             alert('已选择文章，可以选择下一个了');
         });
+    } else if (href.includes('mp.weixin.qq.com')) {
+        let obj = await wxArticle();
+        if (!obj) {
+            return;
+        }
+        gatherList.push(obj);
+        chrome.storage.local.set({ 'gather-list': gatherList }, function () {
+            alert('已选择文章，可以选择下一个了');
+        });
     }
 };
 
@@ -106,32 +115,47 @@ async function toutiaoArticle() {
     }
     return gatherObj;
 };
+
+// 公众号文章采集article
+async function wxArticle() {
+    let gatherObj = {
+        title: $('#activity-name').text(),
+        content: $('#js_content p').text(),
+        url: window.location.href
+    }
+    if (!await check(gatherObj)) {
+        return false;
+    }
+    return gatherObj;
+};
+
+
 // 校验token
 async function checkToken() {
-    // loding = true;
-    // token = await retrieveData('token');
-    // if (!token) {
-    //     alert('当前没有登录，或登录失效，请重新登录');
-    //     loding = false;
-    //     return false;
-    // }
-    let status = true;
-    // $.ajax({
-    //     url: "http://frp.wudiguang.top/user/isLogin?token=" + token,
-    //     type: "get",
-    //     dataType: 'json',
-    //     async: false, // 将 async 设置为 false
-    //     xhrFields: {
-    //         withCredentials: true
-    //     },
-    //     success: function (res) {
-    //         status = res.data;
-    //         if (!status) {
-    //             alert('当前没有登录，或登录失效，请重新登录');
-    //             chrome.storage.local.set({ 'token': null });
-    //         }
-    //     }
-    // });
+    loding = true;
+    token = await retrieveData('token');
+    if (!token) {
+        alert('当前没有登录，或登录失效，请重新登录');
+        loding = false;
+        return false;
+    }
+    let status = false;
+    $.ajax({
+        url: "http://aiwrite.wudiguang.top/user/isLogin?token=" + token,
+        type: "get",
+        dataType: 'json',
+        async: false, // 将 async 设置为 false
+        xhrFields: {
+            withCredentials: true
+        },
+        success: function (res) {
+            status = res.data;
+            if (!status) {
+                alert('当前没有登录，或登录失效，请重新登录');
+                chrome.storage.local.set({ 'token': null });
+            }
+        }
+    });
     loding = false;
     return status;
 };
@@ -202,7 +226,10 @@ async function startExport(event) {
     if (!await checkToken()) {
         return;
     }
-    alert('内容导出按钮被点击了！' + JSON.stringify(event));
+
+    // 使用示例 
+    var content = `${currentPrompt[19]}\n\n${currentPrompt[11]}\n\n${currentPrompt[13]}\n\n${currentPrompt[15]}\n\n${currentPrompt[17]}`;
+    exportToWord(content);
 }
 
 // 与background通信
@@ -230,27 +257,12 @@ async function retrieveData(key) {
         console.error(error);
     }
 }
-function myMethod(key) {
-    alert(111);
-};
-
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    console.log('收到来自 background.js 的消息：', message);
-    // 在这里可以处理来自 background.js 的消息 
-    if (message.method === "myMethod") {
-        console.log('myMethod')
-        // 执行你的方法
-        // sendResponse({ result: "Method executed" });
-        myMethod();
-    }
-});
 
 function createEL() {
-
     let li = '';
     for (let i = 0; i < gatherList.length; i++) {
         li += `<li>
-            <input type="checkbox" name="content" value="${i}">
+            <input type="checkbox" name="content" value="${i}" data-title="${gatherList[i].title}" />
             <a style="text-decoration: none; color:#333" target="_blank" title="${gatherList[i].title}" href="${gatherList[i].url}">${gatherList[i].title}</a>
             <span class="delete-btn" dom-index="${i}">删除</span>
         </li>`;
@@ -259,7 +271,7 @@ function createEL() {
     <div id="ask">
         <p class="title">备注：请上传提问模板或勾选采集文章，点击下面“确定”按钮自动提问，回答结束后会自动导出所有回答内容的Word文件!</p>
         <form>
-            <p><span>浓缩内容指令：</span><textarea id="briefContent">请根据上面文章内容，写一个通俗易懂100字左右的前言</textarea></p>
+        <!-- <p><span>浓缩内容指令：</span><textarea id="briefContent">请根据上面文章内容，写一个通俗易懂100字左右的前言</textarea></p>
             <p><span>写新文章指令：</span><textarea id="newArticle">请根据以上内容，写一篇文章要求原创度高，通俗易懂，结构清晰，不少于1000字</textarea></p>
             <p><span>生成标题指令：</span><textarea id="newTitle">请根据上面文章生成比较吸引人的标题</textarea></p>
             <div class="divflex"><span>生成标题个数：</span><input id="titleCount" type="number" value="5">
@@ -271,7 +283,7 @@ function createEL() {
                     </select>
                 </p>
             </div>
-            <!-- <p><span>上传提问Excel:</span><input id="uploadInput" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></p> -->
+            <p><span>上传提问Excel:</span><input id="uploadInput" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></p> -->
             <p class="divflex"><span>选择文章列表：(共${gatherList.length}篇)</span>
                 <lebel id="countNum"></lebel>
                 <span class="select-btn" id="allSelect">全选</span>
@@ -344,9 +356,27 @@ $('body').on('change', '#contentListsDom input', function () {
 // 点击确认 
 $('body').on('click', '#confirm', function () {
     // chrome.runtime.sendMessage({ message: 'myMethod' }, function (response) { });
+    var checkboxes = document.querySelectorAll('#contentListsDom li input[type="checkbox"]:checked');
+    var titles = Array.from(checkboxes).map(function (checkbox) {
+        return checkbox.getAttribute('data-title');
+    });
+    if (titles.length == 0) {
+        alert('请选择模板文章！');
+        return;
+    }
     // 获取选中的内容
     $('#ask').remove();
     $('#mask').remove();
+    let content = '';
+    for (let i = 0; i < gatherList.length; i++) {
+        if (gatherList[i].title == titles[0]) {
+            content = gatherList[i].content;
+        }
+    }
+    currentPrompt = prompt1;
+    currentPrompt[2] = content;
+    currentPage = 0;
+    console.log(currentPrompt);
     forAsk();
 });
 
@@ -356,19 +386,11 @@ function forAsk() {
         // 模拟在textarea中输入文本
         textarea = document.getElementById('prompt-textarea');
     }
-    let contentList = [
-        '帮我写一份500字的自我介绍',
-        `帮我写一篇 吹灭别人的灯，并不会让自己更加光明；阻挡别人的路，也不会让自己行得更远。“一花独放不是春，百花齐放春满园。”如果世界上只有一种花朵，就算这种花朵再美，那也是单调的。
-        以上两则材料出自习近平总书记的讲话，以生动形象的语言说出了普遍的道理。请据此写一篇文章，体现你的认识与思考。
-        要求：选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。`
-    ]
     // 或页面上是否还正在回答 
     var button = document.querySelector('[aria-label="Stop generating"]');
-    console.log(button);
     // 如果没有回答
     if (!button) {
-        // 如果currentPage大于-1 说明回答过一次 需要获取回答的内容
-        if (currentPage > -1) {
+        if (currentPage !== 0) {
             // 使用 document.querySelectorAll 获取所有具有属性 data-testid 的元素
             var elements = document.querySelectorAll('[data-testid]');
             // 筛选出以 "conversation-turn-" 开头的元素，并且从中找到最后一个元素
@@ -381,28 +403,60 @@ function forAsk() {
             });
             // 现在 lastElement 就是匹配到的最后一个元素
             var markdownContent = lastElement.querySelector('.markdown').textContent;
-            console.log(markdownContent);
+            // 第一步 得到GPT回复
+            if (currentPage === 1 || currentPage === 3 || currentPage === 7 || currentPage === 9 || currentPage === 11 || currentPage === 13 || currentPage === 15 || currentPage === 17 || currentPage === 19) {
+                currentPrompt[currentPage] = markdownContent;
+                ++currentPage;
+            } else if (currentPage === 5) {
+                currentPrompt[currentPage] = markdownContent;
+                currentPrompt[8] = markdownContent;
+                ++currentPage;
+            }
         }
-
-        currentPage++;
-        if(currentPage > contentList.length - 1) {
+        if (currentPage >= 19) {
+            console.log(currentPrompt);
             return;
         }
-        textarea.value = contentList[currentPage];
+        textarea.value = currentPrompt[currentPage];
         // 创建并触发 input 事件
         var inputEvent = new Event('input', { bubbles: true });
         textarea.dispatchEvent(inputEvent);
         $('[data-testid="send-button"]').prop('disabled', false);
         $('[data-testid="send-button"]').click();
+        ++currentPage;
         setTimeout(() => {
             forAsk();
         }, 1000);
     } else {
-        console.log(button);
         // 还在回答中
         setTimeout(() => {
             forAsk();
         }, 1000);
     }
-
 }
+
+function exportToWord(content) {
+    // 创建一个新的 Blob 对象，并指定内容和文件类型
+    var blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+    // 创建一个临时 URL，用于下载 Blob 对象
+    var url = window.URL.createObjectURL(blob);
+
+    // 创建一个链接元素
+    var link = document.createElement('a');
+
+    // 设置链接的属性
+    link.href = url;
+    link.download = 'exported_document.docx'; // 设置下载的文件名
+
+    // 将链接添加到文档中
+    document.body.appendChild(link);
+
+    // 模拟点击链接以触发下载
+    link.click();
+
+    // 清理临时 URL 和链接元素
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+}
+

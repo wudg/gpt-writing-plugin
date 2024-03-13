@@ -61,6 +61,7 @@
     padding: 0 8px;
     border-radius: 4px;
     border: 1px solid #434343;
+    color: #333;
 }
 #ask .divflex .wordTypeBox {
     flex: 1;
@@ -87,6 +88,8 @@
 
 #ask #wordType {
     height: 36px;
+    width: 120px;
+    color: #333;
     padding: 0 8px;
     border-radius: 4px;
     border: 1px solid #434343;
@@ -154,7 +157,8 @@
     width: 20px;
     height: 20px;
     vertical-align: middle;
-    margin-right: 10px
+    margin-right: 10px;
+    color: #333;
 }
 
 #contentListsDom .delete-btn {
