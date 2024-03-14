@@ -141,7 +141,7 @@ async function checkToken() {
     }
     let status = false;
     $.ajax({
-        url: "http://aiwrite.wudiguang.top/user/isLogin?token=" + token,
+        url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
         type: "get",
         dataType: 'json',
         async: false, // 将 async 设置为 false
@@ -258,7 +258,8 @@ async function retrieveData(key) {
     }
 }
 
-function createEL() {
+async function createEL() {
+    gatherList = await retrieveData('gather-list') || [];
     let li = '';
     for (let i = 0; i < gatherList.length; i++) {
         li += `<li>

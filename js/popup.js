@@ -19,7 +19,7 @@ $('.login-btn').click(function () {
     }
     // 开始登录 
     $.ajax({
-        url: "http://aiwrite.wudiguang.top/user/doLogin",
+        url: "https://aiwrite.wudiguang.top/user/doLogin",
         type: "post",
         data: {
             username: username,
@@ -84,7 +84,7 @@ $('.register-btn').click(function () {
     }
     // 开始注册 
     $.ajax({
-        url: "http://aiwrite.wudiguang.top/user/doRegister",
+        url: "https://aiwrite.wudiguang.top/user/doRegister",
         type: "post",
         data: {
             username: username,
@@ -114,7 +114,7 @@ $('.register-btn').click(function () {
     chrome.storage.local.get(['token'], function (items) {
         token = items['token'] || null;
         $.ajax({
-            url: "http://aiwrite.wudiguang.top/user/isLogin?token=" + token,
+            url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
             type: "get",
             dataType: 'json',
             async: false, // 将 async 设置为 false
