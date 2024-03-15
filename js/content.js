@@ -5,10 +5,13 @@ var token = null;
 var gatherList = []; // 采集的数据列表
 
 var loding = false;
-var selectAll = false;
+var selectAll = false; // 是否全选
 var textarea = null; // textarea 输入框元素
-var currentPage = 0; // 当前回答的问题 
-var currentPrompt = [];
+var currentPage = 0; // 当前回答的问题 第几步
+var currentPrompt = null; // 当前选中的模板
+var answerList = []; // 答案列表
+var promptList = null; // 模板列表
+var content = null; // 当前文章
 (function () {
     // 获取textarea元素
     textarea = document.getElementById('prompt-textarea');
@@ -43,7 +46,21 @@ var currentPrompt = [];
         // 创建文字采集按钮元素
         gatherBtn();
     }
+    getPromptList();
 })();
+
+function getPromptList() {
+    $.ajax({
+        url: "https://aiwrite.wudiguang.top/user/json",
+        type: "get",
+        dataType: 'json',
+        success: function (res) {
+            promptList = res.data.rules; 
+        }
+    });
+
+}
+
 // 操作按样式
 function operateBtnCss(button) {
     button.style.fontSize = '16px';
@@ -228,7 +245,10 @@ async function startExport(event) {
     }
 
     // 使用示例 
-    var content = `${currentPrompt[19]}\n\n${currentPrompt[11]}\n\n${currentPrompt[13]}\n\n${currentPrompt[15]}\n\n${currentPrompt[17]}`;
+    let content = '';
+    for (let i = 0; i < currentPrompt.txtOutput.length; i++) {
+        content += `${answerList[currentPrompt.txtOutput[i] - 1]}\n\n`
+    }
     exportToWord(content);
 }
 
@@ -268,10 +288,24 @@ async function createEL() {
             <span class="delete-btn" dom-index="${i}">删除</span>
         </li>`;
     };
+
+    let menuList = '';
+    currentPrompt = promptList[0];
+    for (let i = 0; i < promptList.length; i++) {
+        menuList += `<li class="item ${i == 0 ? 'on' : ''}" data-index="${i}">
+                <div class="item-title">${promptList[i].ruleName}</div>
+                <div class="item-describe">${promptList[i].intro}</div>
+            </li>`;
+    };
     let str = `
     <div id="ask">
-        <p class="title">备注：请上传提问模板或勾选采集文章，点击下面“确定”按钮自动提问，回答结束后会自动导出所有回答内容的Word文件!</p>
-        <form>
+        <div class="menu">
+            <div class="menu-title">模板中心</div>
+            <ul calss="menu-list" id="menuList">
+                ${menuList}
+            </ul>
+        </div>
+        <form class="askFrom">
         <!-- <p><span>浓缩内容指令：</span><textarea id="briefContent">请根据上面文章内容，写一个通俗易懂100字左右的前言</textarea></p>
             <p><span>写新文章指令：</span><textarea id="newArticle">请根据以上内容，写一篇文章要求原创度高，通俗易懂，结构清晰，不少于1000字</textarea></p>
             <p><span>生成标题指令：</span><textarea id="newTitle">请根据上面文章生成比较吸引人的标题</textarea></p>
@@ -285,17 +319,20 @@ async function createEL() {
                 </p>
             </div>
             <p><span>上传提问Excel:</span><input id="uploadInput" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></p> -->
-            <p class="divflex"><span>选择文章列表：(共${gatherList.length}篇)</span>
-                <lebel id="countNum"></lebel>
-                <span class="select-btn" id="allSelect">全选</span>
-                <span class="delete-all-btn" id="allDelete">删除选中</span>
+            <p class="divflex">
+                <span>选择文章列表：(共${gatherList.length}篇)</span> 
+                <!-- <span class="select-btn" id="allSelect">全选</span>
+                <span class="delete-all-btn" id="allDelete">删除选中</span> -->
             </p>
             <ul id="contentListsDom">
                 ${li}
             </ul>
-            <p></p>
+            <div id="btnBOx">
+                <span id="closeButton">取消</span>
+                <span id="confirm">确定(${currentPrompt.ruleName})</span>
+            </div>
         </form>
-        <div id="btnBOx"><span id="closeButton">取消</span> <span id="confirm">确定</span></div>
+        <p class="title">备注：勾选采集文章后，点击下面“确定”按钮自动提问，回答结束后，点击内容导出，可导出Word文件!</p>
     </div>`;
     // 将按钮插入到页面body结束前  
     $(document.body).append(str);
@@ -306,6 +343,15 @@ $('body').on('click', '#closeButton', function () {
     $('#ask').remove();
     $('#mask').remove();
 });
+
+$('body').on('click', '#menuList .item', function () {
+    let index = $(this).data('index');
+    $(this).siblings('li').removeClass('on');
+    $(this).addClass('on');
+    currentPrompt = promptList[index];
+    $('#confirm').text(`确定(${currentPrompt.ruleName})`);
+});
+
 $('body').on('click', '.delete-btn', function () {
     let number = $(this).attr('dom-index');
     gatherList.splice(number, 1); // 从数组中删除指定索引处的元素
@@ -350,6 +396,11 @@ $('body').on('click', '#allSelect', function () {
 });
 // 监听复选框变化事件 
 $('body').on('change', '#contentListsDom input', function () {
+    let $checkbox = $(this);
+    let $parentLi = $checkbox.closest('li');
+    let $siblingsLi = $parentLi.siblings('li');
+    let $otherCheckboxes = $siblingsLi.find('input[type="checkbox"]');
+    $otherCheckboxes.prop('checked', false);
     getCheckboxStatus();
 });
 
@@ -368,16 +419,12 @@ $('body').on('click', '#confirm', function () {
     // 获取选中的内容
     $('#ask').remove();
     $('#mask').remove();
-    let content = '';
     for (let i = 0; i < gatherList.length; i++) {
         if (gatherList[i].title == titles[0]) {
-            content = gatherList[i].content;
+            content = gatherList[i];
         }
     }
-    currentPrompt = prompt1;
-    currentPrompt[2] = content;
     currentPage = 0;
-    console.log(currentPrompt);
     forAsk();
 });
 
@@ -404,21 +451,25 @@ function forAsk() {
             });
             // 现在 lastElement 就是匹配到的最后一个元素
             var markdownContent = lastElement.querySelector('.markdown').textContent;
-            // 第一步 得到GPT回复
-            if (currentPage === 1 || currentPage === 3 || currentPage === 7 || currentPage === 9 || currentPage === 11 || currentPage === 13 || currentPage === 15 || currentPage === 17 || currentPage === 19) {
-                currentPrompt[currentPage] = markdownContent;
-                ++currentPage;
-            } else if (currentPage === 5) {
-                currentPrompt[currentPage] = markdownContent;
-                currentPrompt[8] = markdownContent;
-                ++currentPage;
-            }
+            answerList.push(markdownContent);
         }
-        if (currentPage >= 19) {
-            console.log(currentPrompt);
+        if (currentPage >= currentPrompt.processes.length) {
+            console.log(answerList);
             return;
         }
-        textarea.value = currentPrompt[currentPage];
+        str = currentPrompt.processes[currentPage].express;
+        // 使用对应步骤gpt返回的文案
+        if (currentPrompt.processes[currentPage].operateType == 2) {
+            let numbers = str.match(/\d+/g);
+            str = answerList[numbers[0] - 1];
+        } else if (currentPrompt.processes[currentPage].operateType == 3) {
+            // 3-使用爆文的标题
+            str = str.replace(/\${title}/g, content.title);
+        } else if (currentPrompt.processes[currentPage].operateType == 4) {
+            // 4-使用爆文的正文
+            str = str.replace(/\${body}/g, content.content);
+        }
+        textarea.value = str;
         // 创建并触发 input 事件
         var inputEvent = new Event('input', { bubbles: true });
         textarea.dispatchEvent(inputEvent);

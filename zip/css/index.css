@@ -1,10 +1,12 @@
-*{
+* {
     padding: 0;
     margin: 0;
 }
+
 #ask {
     position: fixed;
-    width: 900px;
+    width: 1200px;
+    display: flex;
     min-height: 600px;
     overflow-y: auto;
     background-color: #fff;
@@ -15,8 +17,17 @@
     padding: 24px;
     z-index: 999;
 }
-#mask{
-    position: fixed; 
+
+#ask .menu {
+    color: #2d2f3f;
+    margin-right: 24px;
+    border-right: 1px solid #d9d9d9;
+    padding-right: 24px;
+    width: 395px;
+}
+
+#mask {
+    position: fixed;
     background-color: rgba(0, 0, 0, 0.8);
     left: 0;
     top: 0;
@@ -24,27 +35,22 @@
     bottom: 0;
     z-index: 998;
 }
-#ask .title {
-    color: #333;
-}
+
 #ask form {
-    padding: 10px 0;
+    flex: 1;
     height: auto;
-    overflow: auto
+    position: relative;
 }
-#ask form p {
-    margin: 12px 0;
-}
+
 #ask form span {
     display: block;
     font-size: 16px;
-    margin-bottom: 8px;
-    color: #333333; 
+    color: #333333;
 }
 
 #ask form textarea {
     display: block;
-    height: 100px; 
+    height: 100px;
     width: calc(100% - 20px);
     font-size: 16px;
     color: #333;
@@ -52,10 +58,12 @@
     padding: 8px;
     border-radius: 8px;
 }
+
 #ask .divflex {
     display: flex;
     align-items: center;
 }
+
 #ask .divflex #titleCount {
     height: 34px;
     padding: 0 8px;
@@ -63,6 +71,7 @@
     border: 1px solid #434343;
     color: #333;
 }
+
 #ask .divflex .wordTypeBox {
     flex: 1;
     display: flex;
@@ -93,19 +102,22 @@
     padding: 0 8px;
     border-radius: 4px;
     border: 1px solid #434343;
-} 
+}
+
 #btnBOx {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%)
+    bottom: -10px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-end;
 }
 
 #btnBOx span {
-    margin: 0 30px;
     padding: 6px 20px;
     font-size: 16px;
     border-radius: 5px;
+    margin: 0 12px;
     color: #2f2f2f;
     cursor: pointer;
     background-color: #d9d9d9;
@@ -134,7 +146,49 @@
     cursor: pointer
 }
 
-#btnBOx span#confirmButton {
+#ask .item-describe {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+#ask .item-title {
+    font-size: 16px;
+}
+
+#ask .item {
+    background: #fff;
+    padding: 12px; 
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0px 0px 1px 1px #d9d9d9;
+    transition: all 0, 3s;
+}
+
+#ask .item:hover {
+    background-color: #54b01c54;
+    box-shadow: 0px 0px 1px 1px #54b01c54;
+}
+
+#ask .item.on {
+    background-color: #54b01c;
+    box-shadow: 0px 0px 1px 1px #54b01c;
+    color: #fff;
+}
+
+#ask .menu-title {
+    font-size: 16px;
+    color: #0e0e0e;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+#ask #menuList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+}
+
+#btnBOx span#confirm {
     background: #54b01c;
     color: #fff;
     text-shadow: none;
@@ -143,13 +197,13 @@
 }
 
 #contentListsDom {
-    height: 280px;
-    padding-right: 30px;
+    height: auto;
+    padding-bottom: 36px;
     overflow: auto
 }
 
 #contentListsDom li {
-    padding: 6px 0;
+    padding: 6px;
     border-bottom: 1px solid #b8b5b5
 }
 
@@ -158,6 +212,7 @@
     height: 20px;
     vertical-align: middle;
     margin-right: 10px;
+    outline: none !important;
     color: #333;
 }
 
@@ -171,4 +226,21 @@
 #contentListsDom ul,
 li {
     list-style: none
+}
+
+#contentListsDom input:focus {
+    outline: none !important;
+}
+
+
+#ask .title {
+    color: #666;
+    font-size: 12px;
+    position: absolute; 
+    text-align: center;
+    bottom: 5px;
+    font-size: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }

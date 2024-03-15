@@ -128,6 +128,18 @@ $('.register-btn').click(function () {
                     token = null;
                 }
                 if (token) {
+                    $.ajax({
+                        url: "https://aiwrite.wudiguang.top/user/userInfo",
+                        type: "get",
+                        dataType: 'json',
+                        success: function (res) {
+                            let data = res.data;
+                            $('.info h2').text(data.name);
+                            $('.info #boxWord').text(data.remark);
+                            $('.info #registerTime').text('注册时间：' + data.registerTime);
+                            $('.info #endTime').text('到期时间：' + datadeadline);
+                        }
+                    });
                     $('.info').show();
                 } else {
                     $('.login').show();
