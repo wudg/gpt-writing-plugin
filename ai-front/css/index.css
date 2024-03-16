@@ -157,7 +157,7 @@
 
 #ask .item {
     background: #fff;
-    padding: 12px; 
+    padding: 12px;
     cursor: pointer;
     border-radius: 8px;
     box-shadow: 0px 0px 1px 1px #d9d9d9;
@@ -236,11 +236,122 @@ li {
 #ask .title {
     color: #666;
     font-size: 12px;
-    position: absolute; 
+    position: absolute;
     text-align: center;
     bottom: 5px;
     font-size: 14px;
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
+}
+
+
+#custom .mask {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+#custom .custom-input {
+    position: fixed;
+    width: 800px;
+    height: auto;
+    background-color: #fff;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 24px;
+    z-index: 1000;
+    border-radius: 10px;
+}
+
+#custom .templateTile {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+
+#custom .step .step-item {
+    font-size: 14px;
+    color: #666;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s;
+}
+
+#custom .step .step-item.on {
+    background: rgb(84, 176, 28);
+    color: #fff;
+    border-color: rgb(84, 176, 28);
+}
+
+#custom .step .step-item:hover {
+    color: rgb(84, 176, 28);
+    background-color: #fff;
+    border-color: rgb(84, 176, 28);
+}
+
+#custom .step {
+    margin-top: 12px;
+    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+}
+
+#custom .textarea-container {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+}
+
+#custom #custom-textarea {
+    display: block;
+    resize: none;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    height: 400px;
+}
+
+#custombtnBOx span#confirmCustombtnBOx {
+    background: #54b01c;
+    color: #fff;
+    text-shadow: none;
+    border-radius: 6px;
+    border: none;
+}
+
+#custombtnBOx {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 24px;
+    justify-content: flex-end;
+}
+
+#custombtnBOx span {
+    padding: 6px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 12px;
+    color: #2f2f2f;
+    cursor: pointer;
+    background-color: #d9d9d9;
+}
+
+#ask form #askCustom {
+    padding: 0;
+    background: transparent;
+    color: #54b01c;
+    margin: 0;
 }

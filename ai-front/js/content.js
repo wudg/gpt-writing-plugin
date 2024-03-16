@@ -10,7 +10,7 @@ var textarea = null; // textarea 输入框元素
 var currentPage = 0; // 当前回答的问题 第几步
 var currentPrompt = null; // 当前选中的模板
 var answerList = []; // 答案列表
-var promptList = null; // 模板列表
+var promptList = []; // 模板列表
 var content = null; // 当前文章
 (function () {
     // 获取textarea元素
@@ -157,6 +157,11 @@ async function checkToken() {
         loding = false;
         return false;
     }
+    let loginTime = await retrieveData('login-time') || null;
+    if (loginTime && isTimestampWithinToday(loginTime)) {
+        loding = false;
+        return true;
+    }
     let status = false;
     $.ajax({
         url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
@@ -171,7 +176,10 @@ async function checkToken() {
             if (!status) {
                 alert('当前没有登录，或登录失效，请重新登录');
                 chrome.storage.local.set({ 'token': null });
+                loding = false;
+                return false;
             }
+            chrome.storage.local.set({ 'login-time': new Date().getTime() });
         }
     });
     loding = false;
@@ -282,6 +290,11 @@ async function createEL() {
         </li>`;
     };
 
+    if (promptList.length === 0) {
+        alert('数据异常，请重新刷新页面！');
+        return;
+    }
+
     let menuList = '';
     currentPrompt = promptList[0];
     for (let i = 0; i < promptList.length; i++) {
@@ -323,6 +336,7 @@ async function createEL() {
             <div id="btnBOx">
                 <span id="closeButton">取消</span>
                 <span id="confirm">确定(${currentPrompt.ruleName})</span>
+                <span id="askCustom">自定义文案</span>
             </div>
         </form>
         <p class="title">备注：勾选采集文章后，点击下面“确定”按钮自动提问，回答结束后，点击内容导出，可导出Word文件!</p>
@@ -397,8 +411,6 @@ $('body').on('change', '#contentListsDom input', function () {
     getCheckboxStatus();
 });
 
-
-// 点击确认 
 $('body').on('click', '#confirm', function () {
     // chrome.runtime.sendMessage({ message: 'myMethod' }, function (response) { });
     var checkboxes = document.querySelectorAll('#contentListsDom li input[type="checkbox"]:checked');
@@ -506,3 +518,20 @@ function exportToWord(content) {
     document.body.removeChild(link);
 }
 
+
+function isTimestampWithinToday(timestamp) {
+    var currentDate = new Date(); // 当前日期
+    var dateFromTimestamp = new Date(timestamp); // 时间戳转换为日期
+    // 比较年、月、日是否相同
+    var isSameYear = currentDate.getFullYear() === dateFromTimestamp.getFullYear();
+    var isSameMonth = currentDate.getMonth() === dateFromTimestamp.getMonth();
+    var isSameDay = currentDate.getDate() === dateFromTimestamp.getDate();
+    return isSameYear && isSameMonth && isSameDay;
+}
+
+
+
+// 点击自定义 
+$('body').on('click', '#askCustom', function () {
+    custom();
+})
