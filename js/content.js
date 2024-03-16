@@ -55,7 +55,8 @@ function getPromptList() {
         type: "get",
         dataType: 'json',
         success: function (res) {
-            promptList = res.data.rules; 
+            promptList = res.data.rules;
+            console.log(promptList);
         }
     });
 
@@ -251,14 +252,6 @@ async function startExport(event) {
     }
     exportToWord(content);
 }
-
-// 与background通信
-function sendMessage(type) {
-    return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ message: type }, function (response) {
-        });
-    });
-};
 function getData(key) {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(key, (result) => {
@@ -424,6 +417,7 @@ $('body').on('click', '#confirm', function () {
             content = gatherList[i];
         }
     }
+    answerList = []; // 答案列表
     currentPage = 0;
     forAsk();
 });
