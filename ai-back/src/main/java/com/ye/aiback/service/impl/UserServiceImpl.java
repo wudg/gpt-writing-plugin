@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ye.aiback.dao.UserDao;
 import com.ye.aiback.domain.R;
 import com.ye.aiback.entity.User;
+import com.ye.aiback.exception.CustomException;
 import com.ye.aiback.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -26,15 +27,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public String doLogin(String username, String password) {
         User user = this.baseMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getUsername, username));
         if(Objects.isNull(user)){
-            throw new IllegalArgumentException("不存在该账号，请重试");
+            throw new CustomException("不存在该账号，请重试");
         }
 
         if(Objects.nonNull(user.getDeadline()) && user.getDeadline().getTime() < System.currentTimeMillis()){
-            throw new IllegalArgumentException("该账号已过期，请联系开发人员（Y1490727316）");
+            throw new CustomException("该账号已过期，请联系开发人员（Y1490727316）");
         }
 
         if(!Objects.equals(password, user.getPassword())){
-            throw new IllegalArgumentException("登录密码错误，请重试");
+            throw new CustomException("登录密码错误，请重试");
 
         }
         StpUtil.login(username);
@@ -43,6 +44,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
     @Override
     public void doRegister(String username, String password, String registerCode) {
+        User existUser = this.baseMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getUsername, username));
+        if(Objects.nonNull(existUser)){
+            throw new CustomException("已存在该用户，请换一个用户名(或联系开发人员Y1490727316)");
+        }
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
