@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AI-document-plugin</title>
+    <style>
+        #box {
+            width: 260px;
+            padding: 10px;
+            text-align: center
+        }
+
+        h2 {
+            text-align: center
+        }
+
+        #boxWord {
+            font-size: 16px;
+            color: red
+        }
+
+        #endTime {
+            display: none;
+            font-size: 16px;
+            color: #000
+        }
+
+        #download {
+            display: none;
+            font-size: 14px;
+            color: #000
+        }
+
+        #download #downloadPlugin {
+            font-size: 16px;
+            color: red
+        }
+
+        #updateTip {
+            display: none;
+            font-size: 16px;
+            color: #00f;
+            margin-left: 15px;
+            cursor: pointer
+        }
+
+        #wxImg {
+            display: none;
+            width: 230px;
+            height: 230px
+        }
+
+        .from-item {
+            margin-bottom: 20px;
+            height: 40px;
+        }
+
+        .s-input {
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            color: #343434;
+            padding: 4px 10px;
+            font-size: 12px;
+            outline: none;
+            width: 200px;
+        }
+
+        .login-btn,
+        .register-btn {
+            cursor: pointer;
+            width: 60px;
+            border: none;
+            background-color: #54b01c;
+            color: #fff;
+            height: 28px;
+        }
+
+        .info,
+        .login,
+        .register {
+            display: none;
+        }
+        
+        .s-link {
+            font-size: 12px;
+            color: #54b01c;
+        }
+
+        .error {
+            font-size: 12px;
+            text-align: left;
+            margin-left: 22px;
+            color: red;
+        }
+    </style>
+</head>
+
+<body> 
+    <div id="box" version="1.0.0">
+        <div class="login">
+            <h2 class="from-title">欢迎登录</h2>
+            <div class="from-item login-name">
+                <input class="s-input" name="name" placeholder="请输入账号" />
+                <div class="error"></div>
+            </div>
+            <div class="from-item login-pwd">
+                <input class="s-input" name="pwd" type="password" placeholder="请输入密码" />
+                <div class="error"></div>
+            </div>
+            <div class="from-item login-btn-p">
+                <button class="s-input s-btn login-btn">登录</button>
+                <div class="error"></div>
+            </div>
+            <div class="from-item">
+                <a href="javascript:void(0);" class="s-link toRegister">还没有账号？去注册》</a>
+            </div>
+        </div>
+        <div class="register">
+            <h2 class="from-title">欢迎注册</h2>
+            <div class="from-item register-name">
+                <input class="s-input" name="name" placeholder="请输入用户名" />
+                <div class="error"></div>
+            </div>
+            <div class="from-item register-pwd">
+                <input class="s-input" name="pwd" type="password" placeholder="请输入密码" />
+                <div class="error"></div>
+            </div>
+            <div class="from-item register-code">
+                <input class="s-input" name="registerCode" placeholder="请输入注册码" />
+                <div class="error"></div>
+            </div>
+            <div class="from-item register-btn-p">
+                <button class="s-input s-btn register-btn">注册</button>
+                <div class="error"></div>
+            </div>
+            <div class="from-item">
+                <a href="javascript:void(0);" class="s-link toLogin">有账号？去登录》</a>
+            </div>
+        </div>
+        <div class="info">
+            <h2></h2>
+            <p id="boxWord"></p>
+            <p id="endTime"></p>
+            <p id="registerTime"></p>
+            <!-- <p id="download">
+                <span id="downloadTip">版本已更新，请先下载最新工具再使用：</span>
+                <a href="JavaScript:;" target="_blank" id="downloadPlugin">最新工具下载</a>
+                <span id="updateTip">更新说明</span>
+            </p>
+            <img id="wxImg" alt="公众号二维码" src=""> -->
+        </div>
+    </div>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/popup.js"></script>
+</body>
+</html>
