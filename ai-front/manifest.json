@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "AI-document",
+    "name": "AI智能采集，自动生成爆文",
     "description": "这是一个利用AI智能采集热点文章，生成爆文，自动导出word文档的工具",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "action": {
         "default_popup": "popup.html",
         "default_icon": "testicon.png"
@@ -11,11 +11,16 @@
         "storage",
         "tabs",
         "scripting"
-    ], 
+    ],
+    "icons": {
+        "16": "testicon.png",
+        "48": "testicon.png",
+        "128": "testicon.png"
+    },
     "content_scripts": [
         {
             "js": [
-                "js/jquery-3.3.1.min.js", 
+                "js/jquery-3.3.1.min.js",
                 "js/content.js",
                 "js/add-template.js",
                 "js/custom.js"

@@ -3,7 +3,7 @@ var exportList = [];
 // 自定义添加prompt
 function addTemplate() {
     addStepList = [];
-    let tips = '<p>${body}：引用对标文章的正文</p><p>${title}：引用对标文章的标题</p><p>${3}：使用GPT回答的文案“3”表示回答的第三骤</p>'
+    let tips = '<p>${body}：引用对标文章的正文</p><p>${title}：引用对标文章的标题</p><p>${3}：使用GPT回答的文案“3”表示回答的第三步</p>'
     let str = `
     <div id="addTemplate">
         <div class="mask"></div>
