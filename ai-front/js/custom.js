@@ -1,12 +1,12 @@
 // 自定义当前prompt
-function custom() {
-    console.log(currentPrompt);
+function custom() { 
     let stepList = '';
-    for (let i = 0; i < currentPrompt.processes.length; i++) {
-        if (currentPrompt.processes[i].operateType === 1) {
-            stepList += `<div class="step-item" data-index="${i}">步骤${i + 1}</div>`;
-        }
+    for (let i = 0; i < currentPrompt.processes.length; i++) { 
+        stepList += `<div class="step-item" data-index="${i}">提问${i + 1}</div>`; 
     };
+
+    let tips ='<p>${body}：引用对标文章的正文</p><p>${title}：引用对标文章的标题</p><p>${3}：使用GPT回答的文案“3”表示回答的第三骤</p>'
+
     let str = `
     <div id="custom">
         <div class="mask"></div>
@@ -17,6 +17,10 @@ function custom() {
             </div>
             <div class="textarea-container">
                 <textarea id="custom-textarea"></textarea>
+            </div>
+            <div class="tips">
+                <p>注意：出现以下关键字请勿更改关键字字符</p>
+                ${tips}
             </div>
             <div id="custombtnBOx">
                 <span id="closeCustombtnBOx">关闭</span>
