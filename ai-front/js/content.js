@@ -143,7 +143,7 @@ async function toutiaoArticle() {
 async function wxArticle() {
     let gatherObj = {
         title: $('#activity-name').text(),
-        content: $('#js_content p').text(),
+        content: $('#js_content').text(),
         url: window.location.href
     }
     if (!await check(gatherObj)) {
