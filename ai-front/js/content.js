@@ -10,8 +10,11 @@ var textarea = null; // textarea 输入框元素
 var currentPage = 0; // 当前回答的问题 第几步
 var currentPrompt = null; // 当前选中的模板
 var answerList = []; // 答案列表
-var promptList = null; // 模板列表
+var promptList = []; // 模板列表
+var localityPromptList = []; // 本地模板列表
 var content = null; // 当前文章
+
+
 (function () {
     // 获取textarea元素
     textarea = document.getElementById('prompt-textarea');
@@ -49,13 +52,15 @@ var content = null; // 当前文章
     getPromptList();
 })();
 
-function getPromptList() {
+async function getPromptList() {
+    localityPromptList = await retrieveData('localityPromptList') || [];
+    promptList = localityPromptList;
     $.ajax({
         url: "https://aiwrite.wudiguang.top/user/json",
         type: "get",
         dataType: 'json',
         success: function (res) {
-            promptList = res.data.rules;
+            promptList = localityPromptList.concat(res.data.rules);
             console.log(promptList);
         }
     });
@@ -138,7 +143,7 @@ async function toutiaoArticle() {
 async function wxArticle() {
     let gatherObj = {
         title: $('#activity-name').text(),
-        content: $('#js_content p').text(),
+        content: $('#js_content').text(),
         url: window.location.href
     }
     if (!await check(gatherObj)) {
@@ -157,6 +162,11 @@ async function checkToken() {
         loding = false;
         return false;
     }
+    let loginTime = await retrieveData('login-time') || null;
+    if (loginTime && isTimestampWithinToday(loginTime)) {
+        loding = false;
+        return true;
+    }
     let status = false;
     $.ajax({
         url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
@@ -171,7 +181,10 @@ async function checkToken() {
             if (!status) {
                 alert('当前没有登录，或登录失效，请重新登录');
                 chrome.storage.local.set({ 'token': null });
+                loding = false;
+                return false;
             }
+            chrome.storage.local.set({ 'login-time': new Date().getTime() });
         }
     });
     loding = false;
@@ -282,18 +295,33 @@ async function createEL() {
         </li>`;
     };
 
+    if (!li) {
+        li = `<li class="none">暂无文章，快去采集文章吧！</li>`;
+    }
+
+    if (promptList.length === 0) {
+        alert('数据异常，请重新刷新页面！');
+        return;
+    }
+
     let menuList = '';
     currentPrompt = promptList[0];
     for (let i = 0; i < promptList.length; i++) {
+        let del = '';
+        if (promptList[i].type) {
+            del = `<span class="delDtep" data-index="${i}">X</span>`;
+        }
         menuList += `<li class="item ${i == 0 ? 'on' : ''}" data-index="${i}">
                 <div class="item-title">${promptList[i].ruleName}</div>
                 <div class="item-describe">${promptList[i].intro}</div>
-            </li>`;
+                ${del}
+            </li>
+        `;
     };
     let str = `
     <div id="ask">
         <div class="menu">
-            <div class="menu-title">模板中心</div>
+            <div class="menu-title">模板中心 <span id="add-template">创建自定义模板</span> </div>
             <ul calss="menu-list" id="menuList">
                 ${menuList}
             </ul>
@@ -313,7 +341,7 @@ async function createEL() {
             </div>
             <p><span>上传提问Excel:</span><input id="uploadInput" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></p> -->
             <p class="divflex">
-                <span>选择文章列表：(共${gatherList.length}篇)</span> 
+                <span>文章列表：(共${gatherList.length}篇)</span> 
                 <!-- <span class="select-btn" id="allSelect">全选</span>
                 <span class="delete-all-btn" id="allDelete">删除选中</span> -->
             </p>
@@ -323,6 +351,7 @@ async function createEL() {
             <div id="btnBOx">
                 <span id="closeButton">取消</span>
                 <span id="confirm">确定(${currentPrompt.ruleName})</span>
+                <span id="askCustom">模板修改文案</span>
             </div>
         </form>
         <p class="title">备注：勾选采集文章后，点击下面“确定”按钮自动提问，回答结束后，点击内容导出，可导出Word文件!</p>
@@ -337,12 +366,13 @@ $('body').on('click', '#closeButton', function () {
     $('#mask').remove();
 });
 
-$('body').on('click', '#menuList .item', function () {
+$('body').on('click', '#menuList .item', function (event) {
     let index = $(this).data('index');
     $(this).siblings('li').removeClass('on');
     $(this).addClass('on');
     currentPrompt = promptList[index];
     $('#confirm').text(`确定(${currentPrompt.ruleName})`);
+    event.stopPropagation(); // 阻止
 });
 
 $('body').on('click', '.delete-btn', function () {
@@ -397,8 +427,6 @@ $('body').on('change', '#contentListsDom input', function () {
     getCheckboxStatus();
 });
 
-
-// 点击确认 
 $('body').on('click', '#confirm', function () {
     // chrome.runtime.sendMessage({ message: 'myMethod' }, function (response) { });
     var checkboxes = document.querySelectorAll('#contentListsDom li input[type="checkbox"]:checked');
@@ -493,7 +521,7 @@ function exportToWord(content) {
 
     // 设置链接的属性
     link.href = url;
-    link.download = 'exported_document.docx'; // 设置下载的文件名
+    link.download = 'AI爆文.docx'; // 设置下载的文件名
 
     // 将链接添加到文档中
     document.body.appendChild(link);
@@ -506,3 +534,49 @@ function exportToWord(content) {
     document.body.removeChild(link);
 }
 
+
+function isTimestampWithinToday(timestamp) {
+    var currentDate = new Date(); // 当前日期
+    var dateFromTimestamp = new Date(timestamp); // 时间戳转换为日期
+    // 比较年、月、日是否相同
+    var isSameYear = currentDate.getFullYear() === dateFromTimestamp.getFullYear();
+    var isSameMonth = currentDate.getMonth() === dateFromTimestamp.getMonth();
+    var isSameDay = currentDate.getDate() === dateFromTimestamp.getDate();
+    return isSameYear && isSameMonth && isSameDay;
+}
+
+
+
+// 点击自定义 
+$('body').on('click', '#askCustom', function () {
+    custom();
+})
+
+// 点击添加自定义 
+$('body').on('click', '#add-template', function () {
+    addTemplate();
+})
+
+$('body').on('click', '#ask .delDtep', function (event) {
+    let index = $(this).data('index');
+    $(this).parent().remove();
+    localityPromptList.splice(index, 1);
+    promptList.splice(index, 1);
+    chrome.storage.local.set({ 'localityPromptList': localityPromptList });
+    let menuList = '';
+    currentPrompt = promptList[0];
+    for (let i = 0; i < promptList.length; i++) {
+        let del = '';
+        if (promptList[i].type) {
+            del = `<span class="delDtep" data-index="${i}">X</span>`;
+        }
+        menuList += `<li class="item ${i == 0 ? 'on' : ''}" data-index="${i}">
+                <div class="item-title">${promptList[i].ruleName}</div>
+                <div class="item-describe">${promptList[i].intro}</div>
+                ${del}
+            </li>
+        `;
+    };
+    $('#menuList').html(menuList);
+    event.stopPropagation(); // 阻止
+});

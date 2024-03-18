@@ -34,7 +34,10 @@ $('.login-btn').click(function () {
             if (res.code == 200) {
                 $('.login').hide();
                 $('.info').show();
+                userInfo(username);
                 chrome.storage.local.set({ 'token': res.data });
+                chrome.storage.local.set({ 'login-time': new Date().getTime() });
+                chrome.storage.local.set({ 'username': username });
 
             } else {
                 $('.login-btn-p .error').text(res.msg);
@@ -111,8 +114,14 @@ $('.register-btn').click(function () {
 (function () {
     $('.login').hide();
     $('.info').hide();
-    chrome.storage.local.get(['token'], function (items) {
+    chrome.storage.local.get(['token'], async function (items) {
         token = items['token'] || null;
+        let loginTime = await retrieveData('login-time') || null;
+        let username = await retrieveData('username') || null;
+        if (loginTime && isTimestampWithinToday(loginTime)) {
+            userInfo(username);
+            return;
+        }
         $.ajax({
             url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
             type: "get",
@@ -128,19 +137,8 @@ $('.register-btn').click(function () {
                     token = null;
                 }
                 if (token) {
-                    $.ajax({
-                        url: "https://aiwrite.wudiguang.top/user/userInfo",
-                        type: "get",
-                        dataType: 'json',
-                        success: function (res) {
-                            let data = res.data;
-                            $('.info h2').text(data.name);
-                            $('.info #boxWord').text(data.remark);
-                            $('.info #registerTime').text('注册时间：' + data.registerTime);
-                            $('.info #endTime').text('到期时间：' + datadeadline);
-                        }
-                    });
-                    $('.info').show();
+                    chrome.storage.local.set({ 'login-time': new Date().getTime() });
+                    userInfo(username);
                 } else {
                     $('.login').show();
                 }
@@ -149,3 +147,46 @@ $('.register-btn').click(function () {
 
     });
 })();
+function userInfo(username) {
+    $.ajax({
+        url: "https://aiwrite.wudiguang.top/user/userInfo?username=" + username,
+        type: "get",
+        dataType: 'json',
+        success: function (res) {
+            let data = res.data;
+            $('.info h2').text(data.name);
+            $('.info #boxWord').text(data.remark);
+            $('.info #registerTime').text('注册时间：' + data.registerTime);
+            $('.info #endTime').text('到期时间：' + data.deadline);
+        }
+    });
+    $('.info').show();
+}
+function getData(key) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(key, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[key] || null);
+            }
+        });
+    });
+}
+async function retrieveData(key) {
+    try {
+        return await getData(key);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function isTimestampWithinToday(timestamp) {
+    var currentDate = new Date(); // 当前日期
+    var dateFromTimestamp = new Date(timestamp); // 时间戳转换为日期
+    // 比较年、月、日是否相同
+    var isSameYear = currentDate.getFullYear() === dateFromTimestamp.getFullYear();
+    var isSameMonth = currentDate.getMonth() === dateFromTimestamp.getMonth();
+    var isSameDay = currentDate.getDate() === dateFromTimestamp.getDate();
+    return isSameYear && isSameMonth && isSameDay;
+}
