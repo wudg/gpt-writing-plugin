@@ -23,6 +23,7 @@ var content = null; // 当前文章
     div.style.position = 'fixed';
     div.style.top = '50%';
     div.style.transform = 'translateY(-50%)';
+    div.style.zIndex = '990';
     div.style.right = '20px';
     div.id = 'gatherDiv';
     // 将按钮插入到页面body结束前
@@ -38,7 +39,7 @@ var content = null; // 当前文章
         token = items['token'] || null;
     });
     // 判断主机名是否包含 "chat.openai.com"
-    if (hostname.includes('chat.openai.com')) {
+    if (hostname.includes('chat.openai.com') || hostname.includes('kimi.moonshot.cn')) {
         // console.log('当前域名包含 chat.openai.com');
         // 批量提问
         questionBtn();
@@ -447,15 +448,29 @@ $('body').on('click', '#confirm', function () {
     }
     answerList = []; // 答案列表
     currentPage = 0;
-    forAsk();
+
+
+    // 判断主机名是否包含 "chat.openai.com"
+    if (hostname.includes('chat.openai.com')) {
+        forAsk();
+    } else if (hostname.includes('kimi.moonshot.cn')) {
+        forAskKimi();
+    }
 });
 
-// 循环提问 openai
-function forAsk() {
+// 循环提问 kimi
+function forAskKimi() {
     if (!textarea) {
         // 模拟在textarea中输入文本
         textarea = document.getElementById('prompt-textarea');
     }
+
+    
+}
+
+
+// 循环提问 openai
+function forAsk() { 
     // 或页面上是否还正在回答 
     var button = document.querySelector('[aria-label="Stop generating"]');
     // 如果没有回答
@@ -491,6 +506,7 @@ function forAsk() {
             // 4-使用爆文的正文
             str = str.replace(/\${body}/g, content.content);
         }
+        textarea = document.getElementById('prompt-textarea');
         textarea.value = str;
         // 创建并触发 input 事件
         var inputEvent = new Event('input', { bubbles: true });
