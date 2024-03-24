@@ -38,7 +38,7 @@ function addTemplate() {
                 </div>
                 <div class="value">
                     <label for="option1">
-                        <input type="radio" id="option1" name="options" value="1">
+                        <input type="radio" id="option1" name="options" value="1" checked>
                         自定义文案
                     </label> 
                     <label for="option2">
@@ -66,10 +66,7 @@ function addTemplate() {
             <div class="textarea-container">
                 <textarea id="addTemplateTextarea"></textarea>
             </div>
-            
-            <div id="custombtnBOx">
-                <span id="saveCustombtnBOx">保持当前项设置</span> 
-            </div>
+             
             <div class="tips">
                 <p>注意：出现以下关键字请勿更改关键字字符</p>
                 ${tips}
@@ -84,19 +81,29 @@ function addTemplate() {
     $(document.body).append(str);
 }
 
-
 // 点击步骤 
 $('body').on('click', '#addTemplate .step .step-item', function () {
     let index = $(this).data('index');
     if (index == '-1') {
+        for (let i = 0; i < addStepList.length; i++) {
+            if (!addStepList[i].express) {
+                alert('请先完成：《提问' + (i + 1) + '》，的提问内容！');
+                return;
+            }
+        }
         addStepList.push({
             express: '',
-            operateType: null,
+            operateType: 1,
         });
         let step = `<div class="step-item" data-index="${addStepList.length - 1}">提问${addStepList.length} <span class="delDtep" data-index="${addStepList.length - 1}">X</span> </div>`;
         let answer = `<div class="step-item" data-index="${addStepList.length - 1}">答案${addStepList.length}</div>`;
         $('#addTemplate .step2').append(step);
         $('#addTemplate .export').append(answer);
+        // 默认选中最后一次添加的
+        $('#addTemplate .step .step-item').removeClass('on');
+        $('#addTemplate .step .step-item').eq(addStepList.length).addClass('on');
+        $('input[type="radio"][name="options"][value="1"]').prop('checked', true);
+        $('#addTemplateTextarea').val('');
         return;
     }
     $(this).siblings('div').removeClass('on');
@@ -114,43 +121,37 @@ $('body').on('change', '#addTemplate input[type="radio"][name="options"]', funct
     var selectedValue = $(this).val();
     renderingTextarea(selectedValue);
 });
+$('body').on('input', '#addTemplate #addTemplateTextarea', function () {
+    changeValue();
+});
 
 function renderingTextarea(val) {
     if (val == 2) {
         $('#addTemplateTextarea').val('${1}');
-        return;
-    }
-    if (val == 3) {
+    } else if (val == 3) {
         $('#addTemplateTextarea').val('${title}');
-        return;
-    }
-    if (val == 4) {
+    } else if (val == 4) {
         $('#addTemplateTextarea').val('${body}');
-        return;
+    } else {
+        $('#addTemplateTextarea').val('');
     }
-    $('#addTemplateTextarea').val('');
+    changeValue();
 }
 
 $('body').on('click', '#addTemplate #closeCustombtnBOx', function () {
     $('#addTemplate').remove();
 });
 
-$('body').on('click', '#addTemplate #saveCustombtnBOx', function () {
+function changeValue() {
     let index = $("#addTemplate .step-item.on").data('index');
     if (index === undefined) {
-        alert('请选中需要修改的步骤');
         return;
     }
-    let val = $('#addTemplateTextarea').val();
-    if (!val) {
-        alert('请输入模板内容');
-        return;
-    }
-    addStepList[index].express = val;
     var selectedValue = $("#addTemplate :radio:checked").val();
-    addStepList[index].operateType = selectedValue; 
-    alert('保存成功！可以继续添加下一项');
-});
+    addStepList[index].operateType = selectedValue;
+    let val = $('#addTemplateTextarea').val();
+    addStepList[index].express = val;
+} 
 
 $('body').on('click', '#addTemplate .delDtep', function (event) {
     let index = $(this).data('index');
@@ -185,7 +186,7 @@ $('body').on('click', '#addTemplate #confirmCustombtnBOx', function () {
 
     for (let i = 0; i < addStepList.length; i++) {
         if (!addStepList[i].express || !addStepList[i].operateType) {
-            alert('提问' + (i + 1) + '，没有填写提问类型或者提问内容！');
+            alert('提问' + (i + 1) + '，没有填写提问内容！');
             return;
         }
     }

@@ -39,8 +39,7 @@ var content = null; // 当前文章
         token = items['token'] || null;
     });
     // 判断主机名是否包含 "chat.openai.com"
-    if (hostname.includes('chat.openai.com') || hostname.includes('kimi.moonshot.cn')) {
-        // console.log('当前域名包含 chat.openai.com');
+    if (hostname.includes('chat.openai.com')) {
         // 批量提问
         questionBtn();
         // 内容导出
@@ -62,7 +61,6 @@ async function getPromptList() {
         dataType: 'json',
         success: function (res) {
             promptList = localityPromptList.concat(res.data.rules);
-            console.log(promptList);
         }
     });
 
@@ -254,12 +252,15 @@ function exportBtn() {
 }
 // 内容导出点击
 async function startExport(event) {
+    if(answerList.length === 0){
+        alert('当前没有可导出的内容！');
+        return;
+    }
     if (loding) { return; };
     if (!await checkToken()) {
         return;
     }
-
-    // 使用示例 
+ 
     let content = '';
     for (let i = 0; i < currentPrompt.txtOutput.length; i++) {
         content += `${answerList[currentPrompt.txtOutput[i] - 1]}\n\n`
@@ -465,12 +466,12 @@ function forAskKimi() {
         textarea = document.getElementById('prompt-textarea');
     }
 
-    
+
 }
 
 
 // 循环提问 openai
-function forAsk() { 
+function forAsk() {
     // 或页面上是否还正在回答 
     var button = document.querySelector('[aria-label="Stop generating"]');
     // 如果没有回答
@@ -491,7 +492,6 @@ function forAsk() {
             answerList.push(markdownContent);
         }
         if (currentPage >= currentPrompt.processes.length) {
-            console.log(answerList);
             return;
         }
         str = currentPrompt.processes[currentPage].express;
@@ -596,3 +596,46 @@ $('body').on('click', '#ask .delDtep', function (event) {
     $('#menuList').html(menuList);
     event.stopPropagation(); // 阻止
 });
+
+// 获取行为记录
+function setUserActionLog(type) {
+    let obj = retrieveData('userActionLog') || null;
+    if (!obj) {
+        obj = {
+            // actionType:
+            initTime: new Date().getTime() // 当前存入的时间
+        }
+    }
+
+
+
+
+    // $.ajax({
+    //     url: "https://aiwrite.wudiguang.top/userActionLog",
+    //     type: "post",
+    //     data: {
+    //         username: username,
+    //         actionType: type
+    //     },
+    //     success: function (res) {
+    //         if (res.code == 200) {
+    //             $('.login').hide();
+    //             $('.info').show();
+    //             userInfo(username);
+    //             chrome.storage.local.set({ 'token': res.data });
+    //             chrome.storage.local.set({ 'login-time': new Date().getTime() });
+    //             chrome.storage.local.set({ 'username': username });
+
+    //         } else {
+    //             $('.login-btn-p .error').text(res.msg);
+    //         }
+    //     },
+    //     error: function (xhr, type, errorThrown) {
+    //         if (xhr.status == 0) {
+    //             $('.login-btn-p .error').text('无法连接到服务器，请检查网络');
+    //         }
+    //         $('.login-btn-p .error').text("异常：" + JSON.stringify(xhr));
+    //     }
+    // });
+
+}

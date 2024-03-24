@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "AI智能采集，自动生成爆文",
     "description": "这是一个利用AI智能采集热点文章，生成爆文，自动导出word文档的工具",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "action": {
         "default_popup": "popup.html",
         "default_icon": "testicon.png"
@@ -31,7 +31,6 @@
             "matches": [
                 "http://127.0.0.1:5500/*",
                 "https://chat.openai.com/*",
-                "https://kimi.moonshot.cn/*",
                 "https://www.toutiao.com/article/*",
                 "https://www.toutiao.com/w/*",
                 "https://www.sohu.com/a/*",

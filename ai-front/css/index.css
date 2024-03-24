@@ -364,8 +364,7 @@ li {
     height: 400px;
 }
 
-#addTemplate span#confirmCustombtnBOx,
-#addTemplate span#saveCustombtnBOx,
+#addTemplate span#confirmCustombtnBOx, 
 #custombtnBOx span#confirmCustombtnBOx {
     background: #54b01c;
     color: #fff;
@@ -373,10 +372,7 @@ li {
     border-radius: 6px;
     border: none;
 }
-
-#addTemplate span#saveCustombtnBOx {
-    margin: 12px 0 0 0;
-}
+ 
 
 #custombtnBOx {
     display: flex;
@@ -462,6 +458,7 @@ li {
     color: #333;
     font-size: 14px;
     margin-right: 12px;
+    display: inline-flex;
 }
 
 
