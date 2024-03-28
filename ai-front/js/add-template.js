@@ -243,8 +243,11 @@ $('body').on('click', '#addTemplate #confirmCustombtnBOx', async function () {
         success: function (res) {
             loding = false;
             if (res.code == 200) {
+                
+                $('#ask').remove();
+                $('#mask').remove();
                 getPromptList(1);
-                alert(res.msg);
+                alert('添加成功');
                 $('#addTemplate').remove();
             } else {
                 alert(res.msg);

@@ -1,0 +1,496 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+#ask {
+    position: fixed;
+    width: 1200px;
+    display: flex;
+    min-height: 600px;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 10px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 24px;
+    z-index: 999;
+}
+
+#ask .menu {
+    color: #2d2f3f;
+    margin-right: 24px;
+    border-right: 1px solid #d9d9d9;
+    padding-right: 24px;
+    width: 395px;
+}
+
+#mask {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 998;
+}
+
+#ask form {
+    flex: 1;
+    height: auto;
+    position: relative;
+}
+
+#ask form span {
+    display: block;
+    font-size: 16px;
+    color: #333333;
+}
+
+#ask form textarea {
+    display: block;
+    height: 100px;
+    width: calc(100% - 20px);
+    font-size: 16px;
+    color: #333;
+    resize: none;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+#ask .divflex {
+    display: flex;
+    align-items: center;
+}
+
+#ask .divflex #titleCount {
+    height: 34px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #434343;
+    color: #333;
+}
+
+#ask .none {
+    border: none;
+    color: #666;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 46px;
+}
+
+#ask .divflex .wordTypeBox {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+#ask form textarea#briefContent {
+    height: 50px
+}
+
+#ask form textarea#newTitle {
+    height: 40px
+}
+
+#ask #titleCount {
+    width: 100px
+}
+
+#ask .wordTypeBox {
+    display: inline-block;
+    margin: 0 0 0 30px
+}
+
+#ask #wordType {
+    height: 36px;
+    width: 120px;
+    color: #333;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #434343;
+}
+
+#btnBOx {
+    position: absolute;
+    bottom: 0px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+#btnBOx span {
+    padding: 6px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 12px;
+    color: #2f2f2f;
+    cursor: pointer;
+    background-color: #d9d9d9;
+}
+
+#ask form span.select-btn {
+    width: auto !important;
+    margin-left: 15px;
+    background: #e2ebf7;
+    padding: 4px 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #8d8888;
+    cursor: pointer
+}
+
+#ask form span.delete-all-btn {
+    width: auto !important;
+    margin-left: 25px;
+    background: #fff;
+    color: red;
+    padding: 4px 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid red;
+    cursor: pointer
+}
+
+#ask .item-describe {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+#ask .item-title {
+    font-size: 16px;
+}
+
+#ask .item {
+    background: #fff;
+    padding: 12px;
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0px 0px 1px 1px #d9d9d9;
+    transition: all 0, 3s;
+}
+
+#ask .item:hover {
+    background-color: #54b01c54;
+    box-shadow: 0px 0px 1px 1px #54b01c54;
+}
+
+#ask .item.on {
+    background-color: #54b01c;
+    box-shadow: 0px 0px 1px 1px #54b01c;
+    color: #fff;
+}
+
+#ask .menu-title {
+    font-size: 16px;
+    color: #0e0e0e;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+#ask #menuList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+}
+
+#btnBOx span#confirm {
+    background: #54b01c;
+    color: #fff;
+    text-shadow: none;
+    border-radius: 6px;
+    border: none;
+}
+
+#contentListsDom {
+    height: auto;
+    padding-bottom: 36px;
+    overflow: auto
+}
+
+#contentListsDom li {
+    padding: 6px;
+    border-bottom: 1px solid #b8b5b5
+}
+
+#contentListsDom input {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 10px;
+    outline: none !important;
+    color: #333;
+}
+
+#contentListsDom .delete-btn {
+    width: auto;
+    float: right;
+    color: red;
+    cursor: pointer
+}
+
+#contentListsDom ul,
+li {
+    list-style: none
+}
+
+#contentListsDom input:focus {
+    outline: none !important;
+}
+
+
+#addTemplate .title,
+#ask .title {
+    color: #666;
+    font-size: 12px;
+    position: absolute;
+    text-align: center;
+    bottom: 5px;
+    font-size: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+
+#addTemplate .mask,
+#custom .mask {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+#addTemplate .custom-input,
+#custom .custom-input {
+    position: fixed;
+    width: 800px;
+    height: auto;
+    background-color: #fff;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 24px;
+    z-index: 1000;
+    border-radius: 10px;
+}
+
+#addTemplate .templateTile,
+#custom .templateTile {
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+
+#addTemplate .step .step-item,
+#custom .step .step-item {
+    font-size: 14px;
+    color: #666;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    position: relative;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s;
+}
+
+#ask .menu .delDtep,
+#addTemplate .step .step-item .delDtep {
+    position: absolute;
+    right: -8px;
+    top: -8px;
+    background: #f00;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    line-height: 16px;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#addTemplate .step .step-item.on,
+#custom .step .step-item.on {
+    background: rgb(84, 176, 28);
+    color: #fff;
+    border-color: rgb(84, 176, 28);
+}
+
+#addTemplate .step .step-item:hover,
+#custom .step .step-item:hover {
+    color: rgb(84, 176, 28);
+    background-color: #fff;
+    border-color: rgb(84, 176, 28);
+}
+
+#addTemplate .step,
+#custom .step {
+    margin-top: 12px;
+    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+}
+
+#addTemplate .step.step2 {
+    margin-top: 0;
+}
+
+#addTemplate .textarea-container,
+#custom .textarea-container {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+}
+
+#addTemplate #addTemplateTextarea,
+#custom #custom-textarea {
+    display: block;
+    resize: none;
+    border: none;
+    outline: none;
+    background-color: #fff;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    height: 400px;
+}
+
+#addTemplate span#confirmCustombtnBOx, 
+#custombtnBOx span#confirmCustombtnBOx {
+    background: #54b01c;
+    color: #fff;
+    text-shadow: none;
+    border-radius: 6px;
+    border: none;
+}
+ 
+
+#custombtnBOx {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+#custombtnBOx span {
+    padding: 6px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 0 12px;
+    color: #2f2f2f;
+    cursor: pointer;
+    background-color: #d9d9d9;
+}
+
+#ask form #askCustom {
+    padding: 0;
+    background: transparent;
+    color: #54b01c;
+    margin: 0;
+}
+
+#addTemplate .tips,
+#custom .tips {
+    color: #f00;
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+#addTemplate .tips {
+    margin-top: 0;
+}
+
+#ask #add-template {
+    color: #54b01c;
+    font-size: 14px;
+    margin-left: 12px;
+    cursor: pointer;
+}
+
+#addTemplate .inputGroup {
+    display: flex;
+    margin-top: 12px;
+}
+
+#addTemplate .inputGroup #templateIntro,
+#addTemplate .inputGroup #templateTitle {
+    background-color: #fff;
+    width: 100%;
+    height: 32px;
+    line-height: 32px;
+    outline: none;
+    font-size: 14px;
+    color: #333;
+    padding: 0 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+#addTemplate .inputGroup .item-input {
+    flex: 1;
+    margin-right: 12px;
+}
+
+#addTemplate .inputGroup .item-input:last-child {
+    margin-right: 0;
+}
+
+#addTemplate .inputGroup .lable {
+    color: #333;
+    font-size: 14px;
+}
+
+#addTemplate .type .lable {
+    color: #333;
+    font-size: 14px;
+}
+
+#addTemplate .type .value label {
+    color: #333;
+    font-size: 14px;
+    margin-right: 12px;
+    display: inline-flex;
+}
+
+
+#addTemplate .type {
+    margin-bottom: 12px;
+}
+
+#addTemplate .export {
+    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+}
+
+#addTemplate .export .step-item {
+    font-size: 14px;
+    color: rgb(102, 102, 102);
+    cursor: pointer;
+    position: relative;
+    margin-right: 12px;
+    margin-top: 12px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(204, 204, 204);
+    border-image: initial;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease 0s;
+}
+
+#addTemplate .export .step-item.on {
+
+    background: rgb(84, 176, 28);
+    color: #fff;
+    border-color: rgb(84, 176, 28);
+}
