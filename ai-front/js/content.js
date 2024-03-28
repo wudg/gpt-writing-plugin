@@ -15,7 +15,10 @@ var localityPromptList = []; // 本地模板列表
 var content = null; // 当前文章
 
 
-(function () {
+// var url = "http://frp.wudiguang.top"; // 测试环境
+var url = "https://aiwrite.wudiguang.top"; // 正式环境
+
+(async function () {
     // 获取textarea元素
     textarea = document.getElementById('prompt-textarea');
     // 创建页面中的按钮组
@@ -35,11 +38,8 @@ var content = null; // 当前文章
 
     // 获取所有本地存储的内容
     getRrticleAll();
-    chrome.storage.local.get(['token'], function (items) {
-        token = items['token'] || null;
-    });
     // 判断主机名是否包含 "chat.openai.com"
-    if (hostname.includes('chat.openai.com')) {
+    if (hostname.includes('chat.openai.com') || hostname.includes('frp.wudiguang.top')) {
         // 批量提问
         questionBtn();
         // 内容导出
@@ -52,15 +52,22 @@ var content = null; // 当前文章
     getPromptList();
 })();
 
-async function getPromptList() {
-    localityPromptList = await retrieveData('localityPromptList') || [];
-    promptList = localityPromptList;
+async function getPromptList(v) {
+    token = await retrieveData('token');
+    if (!token) {
+        return;
+    }
     $.ajax({
-        url: "https://aiwrite.wudiguang.top/user/json",
+        url: url + "/ruleTemplate/listTemplate?token=" + token,
         type: "get",
         dataType: 'json',
         success: function (res) {
-            promptList = localityPromptList.concat(res.data.rules);
+            if (res.code == 200) {
+                promptList = res.data;
+                if (v === 1) {
+                    createEL();
+                }
+            }
         }
     });
 
@@ -103,26 +110,22 @@ async function startGather() {
     if (!await checkToken()) {
         return;
     }
+    let obj = null;
     // 判断主机名是否包含 "chat.openai.com"
     if (href.includes('toutiao.com/article')) {
-        let obj = await toutiaoArticle();
-        if (!obj) {
-            return;
-        }
-        gatherList.push(obj);
-        chrome.storage.local.set({ 'gather-list': gatherList }, function () {
-            alert('已选择文章，可以选择下一个了');
-        });
+        obj = await toutiaoArticle();
+
     } else if (href.includes('mp.weixin.qq.com')) {
-        let obj = await wxArticle();
-        if (!obj) {
-            return;
-        }
-        gatherList.push(obj);
-        chrome.storage.local.set({ 'gather-list': gatherList }, function () {
-            alert('已选择文章，可以选择下一个了');
-        });
+        obj = await wxArticle();
     }
+    if (!obj) {
+        return;
+    }
+    gatherList.push(obj);
+    chrome.storage.local.set({ 'gather-list': gatherList }, function () {
+        alert('已选择文章，可以选择下一个了');
+    });
+    setUserActionLog(1, JSON.stringify(obj));
 };
 
 // 头条文章采集article
@@ -168,7 +171,7 @@ async function checkToken() {
     }
     let status = false;
     $.ajax({
-        url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
+        url: url + "/user/isLogin?token=" + token,
         type: "get",
         dataType: 'json',
         async: false, // 将 async 设置为 false
@@ -229,6 +232,11 @@ async function startQuestion(event) {
     if (!await checkToken()) {
         return;
     }
+
+    if (promptList.length === 0) {
+        getPromptList(1);
+    }
+
     let el = $('#ask');
     if (el.length) {
         // ID 存在
@@ -236,6 +244,8 @@ async function startQuestion(event) {
         // ID 不存在
         createEL();
     }
+    
+    setUserActionLog(1, '');
 
 };
 
@@ -252,7 +262,7 @@ function exportBtn() {
 }
 // 内容导出点击
 async function startExport(event) {
-    if(answerList.length === 0){
+    if (answerList.length === 0) {
         alert('当前没有可导出的内容！');
         return;
     }
@@ -260,12 +270,13 @@ async function startExport(event) {
     if (!await checkToken()) {
         return;
     }
- 
+
     let content = '';
     for (let i = 0; i < currentPrompt.txtOutput.length; i++) {
         content += `${answerList[currentPrompt.txtOutput[i] - 1]}\n\n`
     }
     exportToWord(content);
+    setUserActionLog(3, JSON.stringify(content));
 }
 function getData(key) {
     return new Promise((resolve, reject) => {
@@ -305,18 +316,12 @@ async function createEL() {
         alert('数据异常，请重新刷新页面！');
         return;
     }
-
     let menuList = '';
     currentPrompt = promptList[0];
     for (let i = 0; i < promptList.length; i++) {
-        let del = '';
-        if (promptList[i].type) {
-            del = `<span class="delDtep" data-index="${i}">X</span>`;
-        }
         menuList += `<li class="item ${i == 0 ? 'on' : ''}" data-index="${i}">
                 <div class="item-title">${promptList[i].ruleName}</div>
-                <div class="item-describe">${promptList[i].intro}</div>
-                ${del}
+                <div class="item-describe">${promptList[i].intro}</div> 
             </li>
         `;
     };
@@ -561,8 +566,6 @@ function isTimestampWithinToday(timestamp) {
     return isSameYear && isSameMonth && isSameDay;
 }
 
-
-
 // 点击自定义 
 $('body').on('click', '#askCustom', function () {
     custom();
@@ -598,44 +601,18 @@ $('body').on('click', '#ask .delDtep', function (event) {
 });
 
 // 获取行为记录
-function setUserActionLog(type) {
-    let obj = retrieveData('userActionLog') || null;
-    if (!obj) {
-        obj = {
-            // actionType:
-            initTime: new Date().getTime() // 当前存入的时间
-        }
-    }
-
-
-
-
-    // $.ajax({
-    //     url: "https://aiwrite.wudiguang.top/userActionLog",
-    //     type: "post",
-    //     data: {
-    //         username: username,
-    //         actionType: type
-    //     },
-    //     success: function (res) {
-    //         if (res.code == 200) {
-    //             $('.login').hide();
-    //             $('.info').show();
-    //             userInfo(username);
-    //             chrome.storage.local.set({ 'token': res.data });
-    //             chrome.storage.local.set({ 'login-time': new Date().getTime() });
-    //             chrome.storage.local.set({ 'username': username });
-
-    //         } else {
-    //             $('.login-btn-p .error').text(res.msg);
-    //         }
-    //     },
-    //     error: function (xhr, type, errorThrown) {
-    //         if (xhr.status == 0) {
-    //             $('.login-btn-p .error').text('无法连接到服务器，请检查网络');
-    //         }
-    //         $('.login-btn-p .error').text("异常：" + JSON.stringify(xhr));
-    //     }
-    // });
+async function setUserActionLog(type, desc) {
+    let username = await retrieveData('username') || null;
+    $.ajax({
+        url: url + "/userActionLog",
+        type: "post",
+        dataType: 'json', // 期望的响应数据类型
+        contentType: 'application/json', // 设置请求的内容类型为 JSON
+        data: JSON.stringify({
+            "actionDesc": desc,
+            "actionType": type,
+            "username": username
+        })
+    });
 
 }

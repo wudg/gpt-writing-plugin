@@ -93,7 +93,7 @@ $('body').on('click', '#addTemplate .step .step-item', function () {
         }
         addStepList.push({
             express: '',
-            operateType: 1,
+            operateType: 1
         });
         let step = `<div class="step-item" data-index="${addStepList.length - 1}">提问${addStepList.length} <span class="delDtep" data-index="${addStepList.length - 1}">X</span> </div>`;
         let answer = `<div class="step-item" data-index="${addStepList.length - 1}">答案${addStepList.length}</div>`;
@@ -151,7 +151,7 @@ function changeValue() {
     addStepList[index].operateType = selectedValue;
     let val = $('#addTemplateTextarea').val();
     addStepList[index].express = val;
-} 
+}
 
 $('body').on('click', '#addTemplate .delDtep', function (event) {
     let index = $(this).data('index');
@@ -168,7 +168,10 @@ $('body').on('click', '#addTemplate .delDtep', function (event) {
     event.stopPropagation(); // 阻止
 });
 
-$('body').on('click', '#addTemplate #confirmCustombtnBOx', function () {
+$('body').on('click', '#addTemplate #confirmCustombtnBOx', async function () {
+    if (loding) {
+        return;
+    }
     let title = $("#addTemplate #templateTitle").val();
     if (!title) {
         alert('请输入模板标题');
@@ -194,6 +197,7 @@ $('body').on('click', '#addTemplate #confirmCustombtnBOx', function () {
         alert('请选择导出的内容顺序');
         return;
     }
+    loding = true;
     let obj = {
         type: 1,
         intro,
@@ -202,10 +206,11 @@ $('body').on('click', '#addTemplate #confirmCustombtnBOx', function () {
         processes: addStepList
     }
     promptList.unshift(obj);
-    localityPromptList.unshift(obj);
-    chrome.storage.local.set({ 'localityPromptList': localityPromptList });
 
     let menuList = '';
+    
+    let user = await retrieveData('user-info') || null;
+
     for (let i = 0; i < promptList.length; i++) {
         menuList += `<li class="item ${i == 0 ? 'on' : ''}" data-index="${i}">
                 <div class="item-title">${promptList[i].ruleName}</div>
@@ -213,7 +218,47 @@ $('body').on('click', '#addTemplate #confirmCustombtnBOx', function () {
             </li>`;
     };
     $('#menuList').html(menuList);
-    $('#addTemplate').remove();
+    let l = [];
+    for (let i = 0; i < addStepList.length; i++) {
+        l.push({
+            "express": addStepList[i].express,
+            "operateType": addStepList[i].operateType,
+            "step": i + 1
+        });
+    }  
+    // 开始添加
+    $.ajax({
+        url: url + "/ruleTemplate",
+        type: "post",
+        dataType: 'json', // 期望的响应数据类型
+        contentType: 'application/json', // 设置请求的内容类型为 JSON
+        data: JSON.stringify({
+            "createTemplateFlowReqList": l,
+            "outputSteps": JSON.stringify(exportList),
+            "templateCategory": 1,
+            "templateIntro": intro,
+            "templateName": title,
+            "userId": user.userid
+        }), 
+        success: function (res) {
+            loding = false;
+            if (res.code == 200) {
+                getPromptList(1);
+                alert(res.msg);
+                $('#addTemplate').remove();
+            } else {
+                alert(res.msg);
+            }
+        },
+        error: function (xhr, type, errorThrown) {
+            loding = false;
+            if (xhr.status == 0) {
+                alert('无法连接到服务器，请检查网络');
+            }
+            alert("异常：" + JSON.stringify(xhr));
+        }
+    });
+    setUserActionLog(4, '');
 });
 
 

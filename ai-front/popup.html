@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="IE=Edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>AI-document-plugin</title>
+    <title>AI-plugin</title>
     <style>
         #box {
             width: 260px;
@@ -95,7 +94,10 @@
             margin-left: 22px;
             color: red;
         }
-
+        .tips_info {
+            font-size: 12px;
+            color: red;
+        }
     </style>
 </head>
 
@@ -131,6 +133,11 @@
             </div>
             <div class="from-item register-code">
                 <input class="s-input" name="registerCode" placeholder="请输入注册码" />
+                <div class="error"></div>
+            </div>
+            <div class="tips_info">微信号：为了方便您的使用，可手把手教学</div>
+            <div class="from-item wechat_account">
+                <input class="s-input" name="wechatAccount" placeholder="请输入微信号" />
                 <div class="error"></div>
             </div>
             <div class="from-item register-btn-p">

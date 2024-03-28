@@ -1,11 +1,12 @@
 // 自定义当前prompt
-function custom() { 
+function custom() {
+    console.log(currentPrompt);
     let stepList = '';
-    for (let i = 0; i < currentPrompt.processes.length; i++) { 
-        stepList += `<div class="step-item" data-index="${i}">提问${i + 1}</div>`; 
+    for (let i = 0; i < currentPrompt.processes.length; i++) {
+        stepList += `<div class="step-item" data-index="${i}">提问${i + 1}</div>`;
     };
 
-    let tips ='<p>${body}：引用对标文章的正文</p><p>${title}：引用对标文章的标题</p><p>${3}：使用GPT回答的文案“3”表示回答的第三骤</p>'
+    let tips = '<p>${body}：引用对标文章的正文</p><p>${title}：引用对标文章的标题</p><p>${3}：使用GPT回答的文案“3”表示回答的第三骤</p>'
 
     let str = `
     <div id="custom">
@@ -46,7 +47,7 @@ $('body').on('click', '#custom #closeCustombtnBOx', function () {
     $('#custom').remove();
 });
 
-$('body').on('click', '#custom #confirmCustombtnBOx', function () {
+$('body').on('click', '#custom #confirmCustombtnBOx', async function () {
 
     let index = $("#custom .step-item.on").data('index');
     if (index === undefined) {
@@ -58,7 +59,50 @@ $('body').on('click', '#custom #confirmCustombtnBOx', function () {
     if (!val) {
         alert('请输入模板内容');
         return;
-    } 
+    }
     currentPrompt.processes[index].express = val; 
-    alert('修改成功！');
+    let l = [];
+    for (let i = 0; i < currentPrompt.processes.length; i++) {
+        l.push({
+            "express": currentPrompt.processes[i].express,
+            "operateType": currentPrompt.processes[i].operateType,
+            "id": currentPrompt.processes[i].processId,
+            "step": currentPrompt.processes[i].step,
+        });
+    }  
+    let user = await retrieveData('user-info') || null;
+    // 开始添加
+    $.ajax({
+        url: url + "/ruleTemplate",
+        type: "post",
+        dataType: 'json', // 期望的响应数据类型
+        contentType: 'application/json', // 设置请求的内容类型为 JSON
+        data: JSON.stringify({
+            "createTemplateFlowReqList": l,
+            "outputSteps": JSON.stringify(currentPrompt.txtOutput),
+            "templateCategory": 1,
+            "templateIntro": currentPrompt.intro,
+            "id": currentPrompt.templateId,
+            "templateName": currentPrompt.ruleName,
+            "userId": user.userid
+        }),
+        success: function (res) {
+            loding = false;
+            if (res.code == 200) {
+                alert('修改成功！');
+                $('#custom').remove();
+            } else {
+                alert(res.msg);
+            }
+        },
+        error: function (xhr, type, errorThrown) {
+            loding = false;
+            if (xhr.status == 0) {
+                alert('无法连接到服务器，请检查网络');
+            }
+            alert("异常：" + JSON.stringify(xhr));
+        }
+    });
+    
+    setUserActionLog(4, '');
 });

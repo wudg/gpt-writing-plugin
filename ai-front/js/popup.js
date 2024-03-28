@@ -1,4 +1,6 @@
 var token = null;
+// var url = "http://frp.wudiguang.top"; // 参数环境
+var url = "https://aiwrite.wudiguang.top"; // 正式环境
 
 $('.login-btn').click(function () {
     $('.login-btn-p .error').text('');
@@ -19,7 +21,7 @@ $('.login-btn').click(function () {
     }
     // 开始登录 
     $.ajax({
-        url: "https://aiwrite.wudiguang.top/user/doLogin",
+        url: url + "/user/doLogin",
         type: "post",
         data: {
             username: username,
@@ -65,6 +67,7 @@ $('.register-btn').click(function () {
     let username = $('.register-name [name=name]').val();
     let password = $('.register-pwd [name=pwd]').val();
     let registerCode = $('.register-code [name=registerCode]').val();
+    let wechatAccount = $('.wechat_account [name=wechatAccount]').val();
 
     if (!username) {
         $('.register-name .error').text('请输入用户名');
@@ -81,18 +84,24 @@ $('.register-btn').click(function () {
     } else {
         $('.register-code .error').text('');
     }
+    if (!wechatAccount) {
+        $('.wechat_account .error').text('请输入微信号');
+    } else {
+        $('.wechat_account .error').text('');
+    }
 
-    if (!username || !password || !registerCode) {
+    if (!username || !password || !registerCode || !wechatAccount) {
         return;
     }
     // 开始注册 
     $.ajax({
-        url: "https://aiwrite.wudiguang.top/user/doRegister",
+        url: url + "/user/doRegister",
         type: "post",
         data: {
             username: username,
             password: password,
-            registerCode: registerCode
+            registerCode: registerCode,
+            wechatAccount: wechatAccount,
         },
         dataType: 'json',
         success: function (res) {
@@ -123,7 +132,7 @@ $('.register-btn').click(function () {
             return;
         }
         $.ajax({
-            url: "https://aiwrite.wudiguang.top/user/isLogin?token=" + token,
+            url: url + "/user/isLogin?token=" + token,
             type: "get",
             dataType: 'json',
             async: false, // 将 async 设置为 false
@@ -149,7 +158,7 @@ $('.register-btn').click(function () {
 })();
 function userInfo(username) {
     $.ajax({
-        url: "https://aiwrite.wudiguang.top/user/userInfo?username=" + username,
+        url: url + "/user/userInfo?username=" + username,
         type: "get",
         dataType: 'json',
         success: function (res) {
@@ -158,6 +167,8 @@ function userInfo(username) {
             $('.info #boxWord').text(data.remark);
             $('.info #registerTime').text('注册时间：' + data.registerTime);
             $('.info #endTime').text('到期时间：' + data.deadline);
+            
+            chrome.storage.local.set({ 'user-info': data });
         }
     });
     $('.info').show();
